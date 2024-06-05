@@ -4,7 +4,7 @@ import {ChangeEvent, FormEvent, useState} from "react";
 import {AiFillGithub} from "react-icons/ai";
 import {FcGoogle} from "react-icons/fc";
 import {signUp} from "next-auth-sanity/client";
-import {} from "next-auth/react";
+import {signIn, useSession} from "next-auth/react";
 import toast from "react-hot-toast";
 
 const defaultFormData = {email: "", name: "", password: ""};
@@ -18,6 +18,20 @@ const Auth = () => {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const {name, value} = event.target;
     setFormData({...formData, [name]: value});
+  };
+
+  const {data: session} = useSession();
+
+  console.log(session);
+
+  const loginHandler = async () => {
+    try {
+      await signIn();
+      // push the user to the home page
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -45,8 +59,15 @@ const Auth = () => {
           </h1>
           <p>OR</p>
           <span className='inline-flex items-center'>
-            <AiFillGithub className='mr-3 text-4xl cursor-pointer text-black dark:text-white' />{" "}
-            | <FcGoogle className='ml-3 text-4xl cursor-pointer' />
+            <AiFillGithub
+              onClick={loginHandler}
+              className='mr-3 text-4xl cursor-pointer text-black dark:text-white'
+            />{" "}
+            |{" "}
+            <FcGoogle
+              onClick={loginHandler}
+              className='ml-3 text-4xl cursor-pointer'
+            />
           </span>
         </div>
 
@@ -87,7 +108,9 @@ const Auth = () => {
           </button>
         </form>
 
-        <button className='text-blue-700 underline'>login</button>
+        <button onClick={loginHandler} className='text-blue-700 underline'>
+          login
+        </button>
       </div>
     </section>
   );
